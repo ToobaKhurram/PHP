@@ -1,6 +1,8 @@
 <?php
-include("components/header.php")
+include("components/header.php");
 ?>
+
+
             <!-- Sale & Revenue Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
@@ -265,6 +267,8 @@ include("components/header.php")
                 </div>
             </div>
             <!-- Widgets End -->
-             <?php
-             include("components/footer.php")
-             ?>
+
+
+         <?php
+         include("components/footer.php");
+?>
