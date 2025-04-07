@@ -1,4 +1,3 @@
-
 <?php
 include("php/query.php");
 include("components/header.php");
@@ -7,13 +6,42 @@ include("components/header.php");
 if(isset($_POST['addToCart'])){
 
 	if(isset($_SESSION['cart'])){
+		$productIdsArray = array_column($_SESSION['cart'],'productId');
+		if(in_array($_POST['pId'],$productIdsArray)){
+			echo "<script>alert('product is already added ')</script>";
+		}	
+		else{
 			$count = count($_SESSION['cart']);
 			$_SESSION['cart'][$count] =  array("productId"=>$_POST['pId'],"productName"=>$_POST['pName'],"productPrice"=>$_POST['pPrice'],"productImage"=>$_POST['pImage'],"productQty"=>$_POST['num-product']);
 			echo "<script>alert('product added successfully')</script>";
+		}
 	}
 	else{
 		$_SESSION['cart'][0] = array("productId"=>$_POST['pId'],"productName"=>$_POST['pName'],"productPrice"=>$_POST['pPrice'],"productImage"=>$_POST['pImage'],"productQty"=>$_POST['num-product']);
 		echo "<script>alert('product added successfully')</script>";
+	}
+}
+// remove product from session
+if(isset($_GET['remove'])){
+	$productId = $_GET['remove'];
+	foreach($_SESSION['cart'] as $key=>$value){
+		if($value['productId'] == $productId){
+				unset($_SESSION['cart'][$key]);
+				$_SESSION['cart'] = array_values($_SESSION['cart']);
+				echo "<script>alert('product remove successfully');location.assign('shoping-cart.php')</script>";
+		}
+	}
+	
+}
+
+
+if(isset($_POST['qtyIncDec'])){
+	$proId = $_POST['productId'];
+	$proQty = $_POST['productQty'];
+	foreach($_SESSION['cart'] as $key => $value){
+		if($value['productId'] == $proId){
+			$_SESSION['cart'][$key]['productQty'] = $proQty ;
+		}	
 	}
 }
 ?>
@@ -46,6 +74,7 @@ if(isset($_POST['addToCart'])){
 									<th class="column-3">Price</th>
 									<th class="column-4">Quantity</th>
 									<th class="column-5">Total</th>
+									<th class="column-5">Action</th>
 								</tr>
 
 
@@ -59,23 +88,24 @@ if(isset($_POST['addToCart'])){
 										<div class="how-itemcart1">
 											<img src="adminPanel/images/<?php echo $value['productImage']?>" alt="IMG">
 										</div>
-									</td>
-									<td class="column-2"><?php echo $value['productName']?></td>
-									<td class="column-3">$ <?php echo $value['productPrice']?></td>
-									<td class="column-4">
-										<div class="wrap-num-product flex-w m-l-auto m-r-0">
-											<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-minus"></i>
-											</div>
+							</td>
+							<td class="column-2"><?php echo $value['productName']?></td>
+							<td class="column-3">$ <?php echo $value['productPrice']?></td>
+						<td class="column-4">
+					<div class="wrap-num-product flex-w m-l-auto m-r-0 qtyBox">
+						<input type="hidden" class="pId" value="<?php echo $value['productId']?>">
+					<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m dec">
+						<i class="fs-16 zmdi zmdi-minus"></i>
+						</div>
 
-											<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product2" value="<?php echo $value['productQty']?>">
-
-											<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-plus"></i>
-											</div>
-										</div>
-									</td>
-									<td class="column-5">$ 16.00</td>
+					<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product2" value="<?php echo $value['productQty']?>">
+               <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m inc">
+								<i class="fs-16 zmdi zmdi-plus"></i>
+							</div>
+							</div>
+								</td>
+									<td class="column-5">$<?php echo $value['productQty']*$value['productPrice']?></td>
+									<td class="column-6"><a href="?remove=<?php echo $value['productId']?>" class="btn btn-danger">Remove</a></td>
 								</tr>
 								<?php
 								}
